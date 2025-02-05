@@ -1,2 +1,4 @@
 .venv/
 __pycache__/
+src/saved_connections.json
+src/testing.py
