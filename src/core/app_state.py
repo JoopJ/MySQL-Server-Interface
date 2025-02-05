@@ -8,7 +8,7 @@ import database
 from ui.windows.main_window import MainWindow
 from ui.windows.new_connection_window import NewConnectionWindow
 from ui.windows.server_window import ServerWindow
-from ui.windows.saved_connections_window import SavedConnections
+from ui.windows.saved_connections_window import SavedConnectionsWindow
 
 class AppState():
     """
@@ -85,7 +85,7 @@ class AppState():
                     NewConnectionWindow(self._ui_components)
             case "saved_connections":
                 self._windows["saved_connections"] = \
-                    SavedConnections(self._ui_components)
+                    SavedConnectionsWindow(self._ui_components)
             case "settings":
                 print(f"Settings window not implemented yet")
             case "server_window":

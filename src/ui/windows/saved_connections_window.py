@@ -5,7 +5,7 @@ import tkinter as tk
 from ui.ui_components import UIComponents
 from core.saved_connections import ConnectionManager
 
-class SavedConnections(tk.Toplevel):
+class SavedConnectionsWindow(tk.Toplevel):
     """
     A window that displays saved connections, allows the user to:
     - select and use a saved connection
