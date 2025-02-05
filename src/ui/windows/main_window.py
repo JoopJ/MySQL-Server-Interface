@@ -22,7 +22,14 @@ class MainWindow(tk.Tk):
         self.ui_components = ui_components
         
         self.title("MySQL Server Interface")
-        self.geometry("300x100")
+        window_width = 300
+        window_height = 100
+        # place window in the center of the screen
+        ws = self.winfo_screenwidth()
+        hs = self.winfo_screenheight()
+        x = (ws/2) - (window_width/2)
+        y = (hs/2) - (window_height/2)
+        self.geometry(f"{window_width}x{window_height}+{int(x)}+{int(y)}")
         self.resizable(True, False)
         
     def create_main_menu(self):
@@ -36,7 +43,7 @@ class MainWindow(tk.Tk):
              {"window_name":"saved_connections"}, 0, 1),
             ("Settings", "OPEN_WINDOW", 
              {"window_name":"settings"}, 1, 0),
-            ("Quit", "QUIT_BTN", 
+            ("Quit", "QUIT", 
              {}, 1, 1)
         ]
         # Create a grid layout for the buttons

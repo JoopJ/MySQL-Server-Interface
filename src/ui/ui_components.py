@@ -1,7 +1,7 @@
 
 import tkinter as tk
 from tkinter import ttk
-from typing import Callable, Optional, Any, Dict
+from typing import Callable, Optional, Any, Dict, List
 
 from core.event_system import EventSystem
 
@@ -135,6 +135,32 @@ class UIComponents:
         entry = ttk.Entry(parent, width=width, show=show)
         
         return entry
+    
+    def create_listbox(self,
+                       parent: tk.Widget,
+                       width: int,
+                       height: int,
+                       items_list: List[str],
+                       selectmode: Optional[str] = "single"
+                       ) -> tk.Listbox:
+        
+        """
+        Create a listbox widget. The callback argument is called when an item is selected.
+        
+        Args:
+            parent (tk.Widget): The parent widget to place the listbox in
+            width (int): The width of the listbox
+            height (int): The height of the listbox
+            items_list (List[str]): The list of items to populate the listbox with
+            selectmode (Optional[str]): The selection mode for the listbox. Default is "single"
+        """       
+        # Create the listbox
+        listbox = tk.Listbox(parent, width=width, height=height, selectmode=selectmode)
+        # Populate the listbox with items
+        for item in items_list:
+            listbox.insert(tk.END, item)
+        
+        return listbox
     # -----------------------^ Create UI Components ^----------------------- #   
     
     # -------------------------- Event Interaction ------------------------- #   

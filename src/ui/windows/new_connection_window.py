@@ -72,7 +72,7 @@ class NewConnectionWindow(tk.Toplevel):
     # -------------------------- Event Callbacks -------------------------- #            
     def _connect_server(self):
         self.ui_components.publish(
-            "CONNECT_SERVER", 
+            "CONNECT_TO_SERVER", 
             {
                 "host": self.host_entry.get(),
                 "user": self.user_entry.get(),

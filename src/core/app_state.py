@@ -2,9 +2,12 @@
 from typing import Dict, Any
 import mysql.connector
 
-from ui.windows.main_window import MainWindow
 from ui.ui_components import UIComponents
+import database
+# Windows
+from ui.windows.main_window import MainWindow
 from ui.windows.new_connection_window import NewConnectionWindow
+from ui.windows.server_window import ServerWindow
 
 class AppState():
     """
@@ -15,15 +18,17 @@ class AppState():
         - Handling events through the UIComponents event system
         - Beginning and Quitting the application
     """
-    __slots__ = ["_ui_components", "_connections", "_windows"]
+    __slots__ = ["_ui_components", "_connections", "_windows", 
+                 "_selected_connection"]
              
     def __init__(self, 
                  ui_components: UIComponents,
-                 main_window: MainWindow) -> None: 
+                 main_window: MainWindow) -> None:
         self._ui_components: UIComponents = ui_components
         self._connections: Dict[str, mysql.connector.MySQLConnection]= {}
         self._windows: Dict[str, Any] = {}
         self._windows["main_window"] = main_window
+        self._selected_connection = None
     
         
     def _subscribe_events(self) -> None:
@@ -34,10 +39,12 @@ class AppState():
                                       self._open_window)
         self._ui_components.subscribe("CLOSE_WINDOW",
                                       self._close_window)
-        self._ui_components.subscribe("QUIT_BTN", 
+        self._ui_components.subscribe("QUIT", 
                                       self.quit)
         self._ui_components.subscribe("CONNECT_TO_SERVER", 
                                       self._connect_to_server)
+        self._ui_components.subscribe("USE_DATABASE",
+                                      self._use_database)
         
     # ------------------------------ Running ------------------------------ #
     def begin(self) -> None:
@@ -73,13 +80,18 @@ class AppState():
         print(f"Opening window {window_name}")
         match window_name:
             case "new_connection":
-                print(f"Opening new connection window")
+                print("Opening new connection window")
                 self._windows["new_connection"] = \
                     NewConnectionWindow(self._ui_components)
             case "saved_connections":
                 print(f"Saved Connections window not implemented yet")
             case "settings":
                 print(f"Settings window not implemented yet")
+            case "server_window":
+                print("Opening server window")
+                self._windows["server_window"] = \
+                    ServerWindow(self._ui_components, 
+                        self._selected_connection)
             case _:
                 print(f"Window name {window_name} not found. Cannot open.")
         
@@ -112,17 +124,36 @@ class AppState():
         except mysql.connector.Error as err:
             if err.errno == mysql.connector.errorcode.ER_ACCESS_DENIED_ERROR:
                 print("Invalid username or password")
+                self._ui_components.publish("CONNECT_SERVER_FAIL")
                 return
             elif err.errno == mysql.connector.errorcode.ER_BAD_DB_ERROR:
                 print("Database does not exist")
+                self._ui_components.publish("CONNECT_SERVER_FAIL")
                 return
             else:
                 print(err)
+                self._ui_components.publish("CONNECT_SERVER_FAIL")
                 return 
         # If no errors are raised, add the connection:
         self.add_connection(f"{user}@{host}", connection)
-        self.close_window("new_connection_window")
         print(f"Connected to {user}@{host}")
+        
+        self.select_connection(f"{user}@{host}")
+        
+        self._close_window("new_connection")
+        self._open_window("server_window")
+    
+    def _use_database(self, database_name: str) -> None:
+        """
+        Use a database.
+        
+        Args:
+            database_name (str): The name of the database to use
+        """
+        print(f"Using database {database_name}")
+        database.use_database(self._selected_connection, database_name)
+        # Open database window
+        self._open_window("database_window")
     # -------------------------^ Event Callbacks ^------------------------- #
     
     # ----------------------- Connection Management ----------------------- #
@@ -158,5 +189,11 @@ class AppState():
         """
         self._connections[connection_name].close()
         del self._connections[connection_name]
+    
+    def select_connection(self, connection_name: str) -> None:
+        self._selected_connection = self.get_connection(connection_name)
+        
+    def get_selected_connection(self) -> mysql.connector.MySQLConnection:
+        return self._selected_connection        
     # ----------------------^ Connection Management ^---------------------- #       
 
