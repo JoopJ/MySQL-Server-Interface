@@ -8,6 +8,7 @@ import database
 from ui.windows.main_window import MainWindow
 from ui.windows.new_connection_window import NewConnectionWindow
 from ui.windows.server_window import ServerWindow
+from ui.windows.saved_connections_window import SavedConnections
 
 class AppState():
     """
@@ -80,15 +81,14 @@ class AppState():
         print(f"Opening window {window_name}")
         match window_name:
             case "new_connection":
-                print("Opening new connection window")
                 self._windows["new_connection"] = \
                     NewConnectionWindow(self._ui_components)
             case "saved_connections":
-                print(f"Saved Connections window not implemented yet")
+                self._windows["saved_connections"] = \
+                    SavedConnections(self._ui_components)
             case "settings":
                 print(f"Settings window not implemented yet")
             case "server_window":
-                print("Opening server window")
                 self._windows["server_window"] = \
                     ServerWindow(self._ui_components, 
                         self._selected_connection)
@@ -140,7 +140,6 @@ class AppState():
         
         self.select_connection(f"{user}@{host}")
         
-        self._close_window("new_connection")
         self._open_window("server_window")
     
     def _use_database(self, database_name: str) -> None:
